@@ -1,0 +1,13 @@
+{
+  "scripts": {
+    "collect-stats": "tsm ./scripts/collect-stats.ts"
+  },
+  "dependencies": {
+    "googleapis": "^140.0.0",
+    "p-retry": "^6.2.0",
+    "tsm": "^2.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.9"
+  }
+}
