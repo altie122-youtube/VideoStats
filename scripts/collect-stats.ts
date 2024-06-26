@@ -82,6 +82,7 @@ class YouTubeStatsCollector {
           description: video.snippet.description,
           views: video.statistics.viewCount,
           likes: video.statistics.likeCount,
+          published: video.snippet.publishedAt,
         };
       }
     });
@@ -95,7 +96,9 @@ class YouTubeStatsCollector {
   }
 }
 
-const apiKey = process.env.YOUTUBE_API_KEY!;
-const channelId = process.env.CHANNEL_ID!;
+// const apiKey = process.env.YOUTUBE_API_KEY!;
+// const channelId = process.env.CHANNEL_ID!;
+const apiKey = "AIzaSyDe_T9FnA-kpwi5mfJwsudAur4N-Vc6ROA";
+const channelId = "UC9RA0TJNGmiMcyFYkhvKrtg";
 const collector = new YouTubeStatsCollector(apiKey);
 await collector.run(channelId);
