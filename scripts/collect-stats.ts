@@ -30,8 +30,10 @@ class YouTubeStatsCollector {
 
     const videoStats = await Promise.all(videos.map(video => this.#getVideoStats(video.id)));
 
+    const formattedStats = this.#formatData(videoStats);
+
     console.log('Writing to disk...');
-    await this.#writeData(videoStats);
+    await this.#writeData(formattedStats);
     console.log('Mission complete!');
   }
 
@@ -71,9 +73,24 @@ class YouTubeStatsCollector {
     return await retry(request);
   }
 
+  #formatData(data: any) {
+    const formattedData: Record<string, any> = {};
+    data.forEach((video: any) => {
+      if (video) {
+        formattedData[video.id] = {
+          title: video.snippet.title,
+          description: video.snippet.description,
+          views: video.statistics.viewCount,
+          likes: video.statistics.likeCount,
+        };
+      }
+    });
+    return formattedData;
+  }
+
   async #writeData(data: any) {
     const filePath = './published/videoStats.json';
-    await writeFile(filePath, JSON.stringify(data), 'utf8');
+    await writeFile(filePath, JSON.stringify(data, null, 2), 'utf8');
     console.log(`Data written to ${filePath}`);
   }
 }
