@@ -83,6 +83,7 @@ class YouTubeStatsCollector {
           views: video.statistics.viewCount,
           likes: video.statistics.likeCount,
           published: video.snippet.publishedAt,
+          thumbnails: video.snippet.thumbnails,
         };
       }
     });
