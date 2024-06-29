@@ -1,5 +1,7 @@
 import { google, youtube_v3 } from 'googleapis';
-import { writeFile } from 'node:fs/promises';
+import { promises as fs } from 'fs';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
 import pRetry from 'p-retry';
 
 const retry: typeof pRetry = (fn, opts) =>
@@ -95,22 +97,29 @@ class YouTubeStatsCollector {
   }
 }
 
+// Convert __dirname and __filename for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 // Get the current date and time in UTC format
 function getCurrentDateTimeUTC(): string {
   const now = new Date();
-  return now.toISOString().replace(/[:.]/g, '_').slice(0, 10);
+  return now.toISOString().replace(/[:.]/g, '_').slice(0, 10).replace(/-/g, '/');
 }
 
-
+// Write data to the files paths
 async function writeData(data: any) {
   const filePaths = [
     './published/videoStats.json',
-    `./published/archive/${getCurrentDateTimeUTC()}_videoStats.json`,
+    `./published/archive/${getCurrentDateTimeUTC()}.json`,
   ];
 
   // Iterate over each file path and write the data asynchronously
   await Promise.all(filePaths.map(async (filePath) => {
-    await writeFile(filePath, JSON.stringify(data), 'utf8');
+    // Ensure the directory exists
+    await fs.mkdir(dirname(filePath), { recursive: true });
+    
+    await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8'); // Pretty-print JSON with 2 spaces indentation
     console.log(`Data written to ${filePath}`);
   }));
 }
