@@ -91,10 +91,28 @@ class YouTubeStatsCollector {
   }
 
   async #writeData(data: any) {
-    const filePath = './published/videoStats.json';
-    await writeFile(filePath, JSON.stringify(data, null, 2), 'utf8');
-    console.log(`Data written to ${filePath}`);
+    return await writeData(data);
   }
+}
+
+// Get the current date and time in UTC format
+function getCurrentDateTimeUTC(): string {
+  const now = new Date();
+  return now.toISOString().replace(/[:.]/g, '_').slice(0, 10);
+}
+
+
+async function writeData(data: any) {
+  const filePaths = [
+    './published/videoStats.json',
+    `./published/archive/${getCurrentDateTimeUTC()}_videoStats.json`,
+  ];
+
+  // Iterate over each file path and write the data asynchronously
+  await Promise.all(filePaths.map(async (filePath) => {
+    await writeFile(filePath, JSON.stringify(data), 'utf8');
+    console.log(`Data written to ${filePath}`);
+  }));
 }
 
 const apiKey = process.env.YOUTUBE_API_KEY!;
