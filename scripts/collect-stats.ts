@@ -156,7 +156,7 @@ async function writeData(data: any) {
   );
 }
 
-const apiKey = "AIzaSyDe_T9FnA-kpwi5mfJwsudAur4N-Vc6ROA"!;
-const channelId = "UC9RA0TJNGmiMcyFYkhvKrtg"!;
+const apiKey = process.env.YOUTUBE_API_KEY!;
+const channelId = process.env.CHANNEL_ID!;
 const collector = new YouTubeStatsCollector(apiKey);
 await collector.run(channelId);
