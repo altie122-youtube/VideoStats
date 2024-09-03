@@ -1,8 +1,8 @@
-import { google, youtube_v3 } from 'googleapis';
-import { promises as fs } from 'fs';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-import pRetry from 'p-retry';
+import { google, youtube_v3 } from "googleapis";
+import { promises as fs } from "fs";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+import pRetry from "p-retry";
 
 const retry: typeof pRetry = (fn, opts) =>
   pRetry(fn, {
@@ -21,38 +21,64 @@ class YouTubeStatsCollector {
   constructor(apiKey: string) {
     this.#apiKey = apiKey;
     this.#youtube = google.youtube({
-      version: 'v3',
+      version: "v3",
       auth: this.#apiKey,
     });
   }
 
   async run(channelId: string) {
-    const videos = await this.#getAllVideos(channelId);
-    console.log('Processing data...');
+    console.log("Fetching videos...");
+    const videos1 = await this.#getAllVideos(channelId);
+    console.log(`${videos1.length} videos fetched in fetch 1!`);
+    const videos2 = await this.#getAllVideos(channelId);
+    console.log(`${videos2.length} videos fetched in fetch 2!`);
+    let videos = videos1.length >= videos2.length ? videos1 : videos2;
 
-    const videoStats = await Promise.all(videos.map(video => this.#getVideoStats(video.id)));
+    let retrys = 0;
+    while (retrys < 3 && videos1.length !== videos2.length) {
+      const videos_placeholder = await this.#getAllVideos(channelId);
+      console.log(`${videos_placeholder.length} videos fetched in fetch ${retrys + 2}`);
+      if (videos_placeholder.length > videos.length) {
+        videos = videos_placeholder;
+      }
+      if (videos.length === videos1.length || videos.length === videos2.length) {
+        break;
+      }
+      retrys++;
+    }
+
+    console.log(`${videos.length} videos fetched in ${2 + retrys} attempts!`);
+
+    console.log("Processing data...");
+
+    const videoStats = await Promise.all(
+      videos.map((video) => this.#getVideoStats(video.id))
+    );
 
     const formattedStats = this.#formatData(videoStats);
 
-    console.log('Writing to disk...');
+    console.log("Writing to disk...");
     await this.#writeData(formattedStats);
-    console.log('Mission complete!');
+    console.log("Mission complete!");
   }
 
-  async #getAllVideos(channelId: string, pageToken = ''): Promise<{ id: string }[]> {
+  async #getAllVideos(
+    channelId: string,
+    pageToken = ""
+  ): Promise<{ id: string }[]> {
     const request = async () => {
       const response = await this.#youtube.search.list({
         channelId,
-        part: 'id',
+        part: "id",
         maxResults: 50,
         pageToken,
-        type: 'video',
+        type: "video",
       });
       return response.data;
     };
 
     const data = await retry(request);
-    const videos = data.items?.map(item => ({ id: item.id.videoId })) || [];
+    const videos = data.items?.map((item) => ({ id: item.id.videoId })) || [];
     const nextPageToken = data.nextPageToken;
 
     if (nextPageToken) {
@@ -67,7 +93,7 @@ class YouTubeStatsCollector {
     const request = async () => {
       const response = await this.#youtube.videos.list({
         id: videoId,
-        part: 'statistics, snippet',
+        part: "statistics, snippet",
       });
       return response.data.items?.[0];
     };
@@ -104,27 +130,33 @@ const __dirname = dirname(__filename);
 // Get the current date and time in UTC format
 function getCurrentDateTimeUTC(): string {
   const now = new Date();
-  return now.toISOString().replace(/[:.]/g, '_').slice(0, 10).replace(/-/g, '/');
+  return now
+    .toISOString()
+    .replace(/[:.]/g, "_")
+    .slice(0, 10)
+    .replace(/-/g, "/");
 }
 
 // Write data to the files paths
 async function writeData(data: any) {
   const filePaths = [
-    './published/videoStats.json',
+    "./published/videoStats.json",
     `./published/archive/${getCurrentDateTimeUTC()}.json`,
   ];
 
   // Iterate over each file path and write the data asynchronously
-  await Promise.all(filePaths.map(async (filePath) => {
-    // Ensure the directory exists
-    await fs.mkdir(dirname(filePath), { recursive: true });
-    
-    await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8'); // Pretty-print JSON with 2 spaces indentation
-    console.log(`Data written to ${filePath}`);
-  }));
+  await Promise.all(
+    filePaths.map(async (filePath) => {
+      // Ensure the directory exists
+      await fs.mkdir(dirname(filePath), { recursive: true });
+
+      await fs.writeFile(filePath, JSON.stringify(data, null, 2), "utf8"); // Pretty-print JSON with 2 spaces indentation
+      console.log(`Data written to ${filePath}`);
+    })
+  );
 }
 
-const apiKey = process.env.YOUTUBE_API_KEY!;
-const channelId = process.env.CHANNEL_ID!;
+const apiKey = "AIzaSyDe_T9FnA-kpwi5mfJwsudAur4N-Vc6ROA"!;
+const channelId = "UC9RA0TJNGmiMcyFYkhvKrtg"!;
 const collector = new YouTubeStatsCollector(apiKey);
 await collector.run(channelId);

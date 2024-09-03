@@ -1,3 +1,5 @@
 .env
 
+scripts/collect-stats.js
+
 node_modules/
