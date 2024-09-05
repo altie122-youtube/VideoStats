@@ -37,11 +37,16 @@ class YouTubeStatsCollector {
     let retrys = 0;
     while (retrys < 3 && videos1.length !== videos2.length) {
       const videos_placeholder = await this.#getAllVideos(channelId);
-      console.log(`${videos_placeholder.length} videos fetched in fetch ${retrys + 2}`);
+      console.log(
+        `${videos_placeholder.length} videos fetched in fetch ${retrys + 2}`
+      );
       if (videos_placeholder.length > videos.length) {
         videos = videos_placeholder;
       }
-      if (videos.length === videos1.length || videos.length === videos2.length) {
+      if (
+        videos.length === videos1.length ||
+        videos.length === videos2.length
+      ) {
         break;
       }
       retrys++;
@@ -52,16 +57,26 @@ class YouTubeStatsCollector {
     console.log("Processing data...");
     let videoStats: any = [];
     let videoStatsAttepts = 0;
-    while(videos.length !== videoStats.length) {
+    while (videos.length !== videoStats.length) {
       videoStats = await Promise.all(
         videos.map((video) => this.#getVideoStats(video.id))
       );
-      videoStatsAttepts++
+      videoStatsAttepts++;
     }
 
-    console.log(`${videoStats.length} video stats fetched in ${videoStatsAttepts} attempts!`);
-    let formattedStats: a
-    formattedStats = this.#formatData(videoStats);
+    console.log(
+      `${videoStats.length} video stats fetched in ${videoStatsAttepts} attempts!`
+    );
+    let formattedStats: any = [];
+    let formattedStatsattepts = 0;
+    while (formattedStats.length !== videoStats.length) {
+      formattedStats = this.#formatData(videoStats);
+      formattedStatsattepts++;
+    }
+
+    console.log(
+      `${formattedStats.length} stats formatted in ${formattedStatsattepts} attempts!`
+    );
 
     console.log("Writing to disk...");
     await this.#writeData(formattedStats);
