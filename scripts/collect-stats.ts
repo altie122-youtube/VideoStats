@@ -67,7 +67,7 @@ class YouTubeStatsCollector {
     console.log(
       `${videoStats.length} video stats fetched in ${videoStatsAttepts} attempts!`
     );
-    let formattedStats: any = [];
+    let formattedStats: any = {};
     let formattedStatsattepts = 0;
     while (videoStats.length !== formattedStats.length) {
       formattedStats = this.#formatData(videoStats);
