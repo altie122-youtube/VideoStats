@@ -50,7 +50,7 @@ class YouTubeStatsCollector {
     console.log(`${videos.length} videos fetched in ${2 + retrys} attempts!`);
 
     console.log("Processing data...");
-    let videoStats: any
+    let videoStats: any = [];
     let videoStatsAttepts
     while(videos.length !== videoStats.length) {
       videoStats = await Promise.all(
