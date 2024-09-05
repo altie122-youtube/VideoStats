@@ -51,7 +51,7 @@ class YouTubeStatsCollector {
 
     console.log("Processing data...");
     let videoStats: any = [];
-    let videoStatsAttepts
+    let videoStatsAttepts = 0;
     while(videos.length !== videoStats.length) {
       videoStats = await Promise.all(
         videos.map((video) => this.#getVideoStats(video.id))
