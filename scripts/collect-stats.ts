@@ -60,8 +60,8 @@ class YouTubeStatsCollector {
     }
 
     console.log(`${videoStats.length} video stats fetched in ${videoStatsAttepts} attempts!`);
-
-    const formattedStats = this.#formatData(videoStats);
+    let formattedStats: a
+    formattedStats = this.#formatData(videoStats);
 
     console.log("Writing to disk...");
     await this.#writeData(formattedStats);
