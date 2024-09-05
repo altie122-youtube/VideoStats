@@ -72,6 +72,7 @@ class YouTubeStatsCollector {
     while (formattedStats.length !== videoStats.length) {
       formattedStats = this.#formatData(videoStats);
       formattedStatsattepts++;
+      console.log(`format attempt ${formattedStatsattepts} finished...`)
     }
 
     console.log(
