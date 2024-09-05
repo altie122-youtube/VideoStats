@@ -69,10 +69,14 @@ class YouTubeStatsCollector {
     );
     let formattedStats: any = [];
     let formattedStatsattepts = 0;
-    while (formattedStats.length !== videoStats.length) {
+    while (videoStats.length !== formattedStats.length) {
       formattedStats = this.#formatData(videoStats);
       formattedStatsattepts++;
-      console.log(`format attempt ${formattedStatsattepts} finished...`)
+      console.log(`format attempt ${formattedStatsattepts} finished with ${formattedStats.length}formats...`)
+      if (formattedStatsattepts > 10){
+        console.log(`max format attempts reached.`)
+        break
+      }
     }
 
     console.log(
