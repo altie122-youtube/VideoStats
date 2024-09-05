@@ -82,7 +82,7 @@ class YouTubeStatsCollector {
     console.log(
       `${formattedStats.length} stats formatted in ${formattedStatsattepts} attempts!`
     );
-
+    console.log(`${formattedStats}`)
     console.log("Writing to disk...");
     await this.#writeData(formattedStats);
     console.log("Mission complete!");
